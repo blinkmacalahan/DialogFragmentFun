@@ -36,6 +36,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.doWork).setOnClickListener { _ ->
             model.doWork()
         }
+
+        if (savedInstanceState != null && model.showDialog.value == null) {
+            NonCancellableDialogFragment.dismiss(supportFragmentManager)
+        }
     }
 }
 
