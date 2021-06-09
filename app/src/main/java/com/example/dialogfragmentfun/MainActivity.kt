@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 
@@ -43,12 +42,18 @@ class MainActivity : AppCompatActivity() {
  * A basic indeterminate progress dialog that can't be cancelled via hardware back key or touching outside the dialog
  */
 class NonCancellableDialogFragment : DialogFragment() {
+
     companion object {
 
         private const val TAG = "NonCancellableDialogFragment"
 
         fun show(fragmentManager: FragmentManager) {
-            NonCancellableDialogFragment().show(fragmentManager, TAG)
+            Log.d(LOG_TAG, "NonCancellableDialogFragment.show()")
+            val dialog = (fragmentManager.findFragmentByTag(TAG) as? NonCancellableDialogFragment)
+            if (dialog == null) {
+                Log.d(LOG_TAG, "NonCancellableDialogFragment not present, creating and showing dialog")
+                NonCancellableDialogFragment().showNow(fragmentManager, TAG)
+            }
         }
 
         fun dismiss(fragmentManager: FragmentManager) {
@@ -73,23 +78,30 @@ class NonCancellableDialogFragment : DialogFragment() {
     }
 }
 
-class SimpleViewModel : ViewModel() {
-    private val _showDialog: MutableLiveData<Boolean?> = MutableLiveData(null)
-    val showDialog: LiveData<Boolean?> = _showDialog
+class SimpleViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+    companion object {
+
+        private const val SHOW_DIALOG_KEY = "show_dialog_key"
+    }
+
+    val showDialog: LiveData<Boolean?> = savedStateHandle.getLiveData(SHOW_DIALOG_KEY, null)
 
     private val handler = Handler(Looper.getMainLooper())
 
     init {
         Log.d(LOG_TAG, "SimpleViewModel init")
+        if (savedStateHandle.get<Boolean>(SHOW_DIALOG_KEY) == true) {
+            doWork()
+        }
     }
 
     /**
      * Pretends to be doing something that requires the dialog to be shown for 10 seconds
      */
     fun doWork() {
-        _showDialog.postValue(true)
+        savedStateHandle[SHOW_DIALOG_KEY] = true
         handler.postDelayed({
-            _showDialog.postValue(false)
+            savedStateHandle[SHOW_DIALOG_KEY] = false
         }, 10000)
     }
 }
