@@ -13,7 +13,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +26,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(LOG_TAG, "observing showDialog -> $showDialog")
             showDialog ?: return@observe
             if (showDialog) {
+                NonCancellableDialogFragment.show(supportFragmentManager)
                 NonCancellableDialogFragment.show(supportFragmentManager)
             } else {
                 NonCancellableDialogFragment.dismiss(supportFragmentManager)
@@ -47,12 +47,13 @@ class MainActivity : AppCompatActivity() {
  * A basic indeterminate progress dialog that can't be cancelled via hardware back key or touching outside the dialog
  */
 class NonCancellableDialogFragment : DialogFragment() {
+
     companion object {
 
         private const val TAG = "NonCancellableDialogFragment"
 
         fun show(fragmentManager: FragmentManager) {
-            NonCancellableDialogFragment().show(fragmentManager, TAG)
+            NonCancellableDialogFragment().showNow(fragmentManager, TAG)
         }
 
         fun dismiss(fragmentManager: FragmentManager) {
@@ -78,6 +79,7 @@ class NonCancellableDialogFragment : DialogFragment() {
 }
 
 class SimpleViewModel : ViewModel() {
+
     private val _showDialog: MutableLiveData<Boolean?> = MutableLiveData(null)
     val showDialog: LiveData<Boolean?> = _showDialog
 
