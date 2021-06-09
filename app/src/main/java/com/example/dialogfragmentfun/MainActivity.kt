@@ -15,6 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,6 +64,11 @@ class NonCancellableDialogFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val model = ViewModelProvider(requireActivity()).get(SimpleViewModel::class.java)
+        if (model.showDialog.value != true) {
+            dismiss()
+            return
+        }
         setStyle(STYLE_NORMAL, android.R.style.Theme_DeviceDefault_Light_Dialog)
         Log.d(LOG_TAG, "onCreate ${this::class.java.simpleName}")
     }
