@@ -53,7 +53,12 @@ class NonCancellableDialogFragment : DialogFragment() {
         private const val TAG = "NonCancellableDialogFragment"
 
         fun show(fragmentManager: FragmentManager) {
-            NonCancellableDialogFragment().showNow(fragmentManager, TAG)
+            Log.d(LOG_TAG, "NonCancellableDialogFragment.show()")
+            val dialog = (fragmentManager.findFragmentByTag(TAG) as? NonCancellableDialogFragment)
+            if (dialog == null) {
+                Log.d(LOG_TAG, "NonCancellableDialogFragment not present, creating and showing dialog")
+                NonCancellableDialogFragment().showNow(fragmentManager, TAG)
+            }
         }
 
         fun dismiss(fragmentManager: FragmentManager) {
